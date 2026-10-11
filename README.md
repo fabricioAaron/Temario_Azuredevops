@@ -41,3 +41,26 @@ EPIC
 │   └── TASK
 │
 └── ISSUE
+
+## Credential manager
+
+sirve para que no tengas que meter la contraseña de azure devops cada vez que hagas un git push o git pull
+
+``git config --global credential.helper manager``
+
+git config --global user.name "name"
+git config --global user.email "[EMAIL_ADDRESS]"
+
+
+# antigravity o vscode 
+
+En el apartado de soucer control cuanod hagamos foscambios de archivos diferente 
+
+<img width="429" height="300" alt="imagen" src="https://github.com/user-attachments/assets/7bf9cef1-2cec-493e-be51-b4a8e94eec14" />
+
+Changes: Modificado en local, pero no seleccionado para guardar.
+
+Staged Changes: Seleccionado y listo para hacer Commit.
+
+Commit: Guardado en el historial de tu máquina; ahora sí está listo para hacer Push.
+
