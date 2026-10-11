@@ -113,3 +113,99 @@ Project setting > repositories
 se puede crear politicas nivel de branches 
 
 
+# comando de git : 
+inspecciona en profundidad la configuración y el estado de sincronización entre tu repositorio local y el repositorio remoto denominado
+
+``git remote show origin`` 
+
+
+Propósito: Modificar la dirección de un remoto que ya existe.
+
+Cuándo usarlo: Cuando necesitas cambiar el destino al que apunta un alias existente (por ejemplo, migrar un repositorio clonado desde GitHub hacia Azure DevOps, o tras un cambio de dominio/organización).
+
+``git remote set-url origin``  "https://<organizacion>@dev.azure.com/<organizacion>/<proyecto>/_git/<repositorio>"
+
+
+## Activar editor clasico en pipeline : 
+
+Tenemos que ir Organization settings pipeline setting y desde alli desactivaremos la opcion y luego ya lo podremo ver en project settings 
+
+Crearemos un pipeline desde 0 con editor clasico y vacío 
+
+<img width="1883" height="658" alt="imagen" src="https://github.com/user-attachments/assets/c3f1ec99-f9b6-465d-9489-620b4c5b1249" />
+
+podemos agregar agente de trabajo ya que hemos usado como agente del propio microsft es por ello esot depende de necesidades 
+
+### Solución en caso de que suceda alguna vez : 
+
+Troubleshooting Runbook: Pantalla por defecto de Azure tras despliegue CI/CD
+1. Síntoma
+
+El pipeline en Azure DevOps finaliza en verde con el mensaje Successfully deployed web package to App Service, pero al abrir la URL pública (https://<app>.azurewebsites.net) sigue cargando la página de bienvenida morada/azul de Azure en lugar de la aplicación frontend (React/SPA).
+2. Causa raíz
+
+Existen dos motivos principales para este comportamiento:
+
+    Persistencia de caché en App Service (Linux): Azure App Service monta el almacenamiento en red y utiliza copias en caché local en el contenedor para acelerar la lectura. Tras un despliegue rápido, el servidor web interno continúa sirviendo la página por defecto almacenada en memoria caché en vez de refrescar los archivos recién subidos a /home/site/wwwroot.
+
+    Runtime Stack incorrecto: Las aplicaciones React compiladas (npm run build) son sitios estáticos puros (HTML/CSS/JS). Si en la tarea de despliegue se mantiene configurado un runtime de Node.js dinámico (Node 18/Node 20), el servidor espera un proceso backend escuchando en un puerto en lugar de servir directamente los archivos estáticos generados.
+
+3. Procedimiento de resolución
+Paso 1: Deshabilitar el caché local en Azure Portal
+
+    Accede a Azure Portal > navega a tu App Service.
+
+    En el menú lateral izquierdo, ve a Settings > Configuration (o Environment variables según la interfaz).
+
+    En la sección Application settings, añade las siguientes dos variables:
+
+        WEBSITE_DYNAMIC_CACHE = 0
+
+        WEBSITE_LOCAL_CACHE_OPTION = Never
+
+    Guarda los cambios haciendo clic en Save y confirma en Continue.
+
+    Ve a Overview y ejecuta Stop seguido de Start para forzar un reinicio limpio del contenedor.
+
+    Verificación: En Configuration, ambas variables deben figurar en la lista con sus valores asignados y el estado del recurso debe volver a marcarse como Running.
+
+    ejecutaremos en este apartado 
+    
+    <img width="1373" height="681" alt="imagen" src="https://github.com/user-attachments/assets/9fa00f46-42c2-4357-b2e8-fa2ea11507ae" />
+
+    ``npx serve -s /home/site/wwwroot -p 8080``
+
+
+ [youtube demo-CI.yml](https://github.com/user-attachments/files/33308286/youtube.demo-CI.yml)
+jobs:
+- job: Job_1
+  displayName: Agent job 1
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - checkout: self
+    fetchDepth: 1
+  - task: Npm@1
+    displayName: npm install
+    inputs:
+      verbose: false
+  - task: Npm@1
+    displayName: npm build
+    inputs:
+      command: custom
+      verbose: false
+      customCommand: run build
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: drop'
+    inputs:
+      PathtoPublish: build
+  - task: AzureRmWebAppDeployment@5
+    displayName: 'Azure App Service Deploy: youtubedemofabri'
+    inputs:
+      ConnectedServiceName: d961187b-624f-4d08-b767-fad085ed0c0a
+      WebAppKind: webAppLinux
+      WebAppName: youtubedemofabri
+      Package: $(System.DefaultWorkingDirectory)/build
+      RuntimeStack: NODE|20-lts
+... 
+
