@@ -64,3 +64,52 @@ Staged Changes: Seleccionado y listo para hacer Commit.
 
 Commit: Guardado en el historial de tu máquina; ahora sí está listo para hacer Push.
 
+<img width="843" height="473" alt="imagen" src="https://github.com/user-attachments/assets/f158a304-0f0b-4b52-bb14-96be74db587b" />
+
+## Branches
+
+### de anti a azure 
+
+Se puede trabjaar con brances remotas y loca l en este caso se puede crear un rama de dev desde el main se ha ce una copia luego se sube a remota 
+
+<img width="581" height="407" alt="imagen" src="https://github.com/user-attachments/assets/4265ff49-470c-4c2b-9c97-aac215e8e832" />
+
+luego para poder eliminar lo azuremes de azure devops y desde anti ``ctrl + shift + p`` ponemos : 
+
+``git delete branch`` 
+
+desde alli mismo le damos a : 
+
+``git fetch prune``
+
+Su función principal es limpiar las referencias locales de ramas remotas que ya han sido eliminadas en el servidor (como Azure Repos o GitHub).
+
+## Azure a anti
+
+creamos el branch en azure, luego desde local ``ctrl + shift + p``
+
+``git fetch``
+
+Para poder restaurar un brances que  he eliminado  tiene que tener el mismo nombre. 
+
+<img width="1553" height="747" alt="imagen" src="https://github.com/user-attachments/assets/2e2b39ed-6692-4e99-b63e-bdf6c1c07f01" />
+
+## solicitar un Pull request 
+
+lo que heremos ocmo vimo en el apartado anterior estaremos en en el commit en CHANGE  haremos el commit lo haremos en nuestra rma que estmos trajando para solicitar que nuestro cambio lo revise y lo pasen al master. 
+
+<img width="975" height="788" alt="imagen" src="https://github.com/user-attachments/assets/363031cc-16f0-4f2d-b735-803ef8120bc6" />
+
+Aunque este aprobado la solicitud tenemos que completarlo 
+
+<img width="528" height="353" alt="imagen" src="https://github.com/user-attachments/assets/0227b822-6ad4-4bb6-955f-93cccc156323" />
+
+## Para agregar políticas de seguridad
+
+A nivel de repositorio se puede hacer en 
+
+Project setting > repositories 
+
+se puede crear politicas nivel de branches 
+
+
