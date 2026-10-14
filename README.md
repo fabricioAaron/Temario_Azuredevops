@@ -177,35 +177,64 @@ Paso 1: Deshabilitar el caché local en Azure Portal
 
 
  [youtube demo-CI.yml](https://github.com/user-attachments/files/33308286/youtube.demo-CI.yml)
-jobs:
-- job: Job_1
-  displayName: Agent job 1
-  pool:
-    vmImage: ubuntu-latest
-  steps:
-  - checkout: self
-    fetchDepth: 1
-  - task: Npm@1
-    displayName: npm install
-    inputs:
-      verbose: false
-  - task: Npm@1
-    displayName: npm build
-    inputs:
-      command: custom
-      verbose: false
-      customCommand: run build
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: drop'
-    inputs:
-      PathtoPublish: build
-  - task: AzureRmWebAppDeployment@5
-    displayName: 'Azure App Service Deploy: youtubedemofabri'
-    inputs:
-      ConnectedServiceName: d961187b-624f-4d08-b767-fad085ed0c0a
-      WebAppKind: webAppLinux
-      WebAppName: youtubedemofabri
-      Package: $(System.DefaultWorkingDirectory)/build
-      RuntimeStack: NODE|20-lts
-... 
+```yaml
+trigger: 
+ - main # es el main branch de donde se dispara el pipeline
 
+stages: # Son las etapas del pipeline
+ - stage: Build # Es la etapa de compilación
+   jobs: # Son los trabajos que se ejecutan en la etapa
+   - job: Build # Es el trabajo de compilación
+     pool: # Es el grupo de agentes que se ejecutan en la etapa
+      vmImage: 'ubuntu-latest'
+     steps:
+      - task: Npm@1
+        inputs:
+         command: 'install'
+      - task: Npm@1
+        inputs:
+         command: 'custom'
+         customCommand: 'run build'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'build'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+  
+ - stage: Deploy # Es la etapa de despliegue
+   jobs: # Son los trabajos que se ejecutan en la etapa
+   - job: Deploy # Es el trabajo de despliegue
+     pool: # Es el grupo de agentes que se ejecutan en la etapa
+      vmImage: 'ubuntu-latest'
+     steps:
+      - task: DownloadBuildArtifacts@1
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'drop'
+          downloadPath: '$(System.ArtifactsDirectory)'
+      - task: AzureRmWebAppDeployment@5
+        inputs:
+          ConnectionType: 'AzureRM'
+          azureSubscription: 'Azure subscription 1 (fad7f081-7ad7-4d08-af48-37d28ff187a6)'
+          appType: 'webAppLinux'
+          WebAppName: 'youtubedemofabri'
+          packageForLinux: '$(System.ArtifactsDirectory)/drop'
+          RuntimeStack: 'NODE|22-lts'
+          DeploymentTypeLinux: 'oneDeploy'
+```
+
+| Concepto | Qué hace | Pregunta que responde |
+|---|---|---|
+| **Build (CI)** | Descarga el código, instala paquetes (`npm install`), compila (`npm run build`) y genera un artefacto empaquetado (`drop`). | ¿El código compila sin errores y pasa las pruebas? |
+| **Release (CD)** | Toma ese paquete compilado (`drop`) y lo publica en servidores, App Services, contenedores o clusters. | ¿A qué servidor y bajo qué aprobaciones enviamos la aplicación? |
+
+### Elementos principales de una Release
+
+1. **Artifacts (Entrada):**
+   - Es el paquete que generó la etapa de compilación. La Release no vuelve a compilar código fuente; consume directamente el resultado final inmutable.
+2. **Stages / Environments (Etapas o Entornos):**
+   - Representan los destinos lógicos donde se instala la app.
+   - Ejemplo típico de flujo:
+     - Artifact $\rightarrow$ Desarrollo (Dev) $\rightarrow$ Preproducción (Staging) $\rightarrow$ Producción (Prod).
