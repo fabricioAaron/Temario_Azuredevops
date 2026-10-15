@@ -238,3 +238,15 @@ stages: # Son las etapas del pipeline
    - Representan los destinos lógicos donde se instala la app.
    - Ejemplo típico de flujo:
      - Artifact $\rightarrow$ Desarrollo (Dev) $\rightarrow$ Preproducción (Staging) $\rightarrow$ Producción (Prod).
+
+
+
+
+<img width="831" height="378" alt="imagen" src="https://github.com/user-attachments/assets/d82f2776-cfdc-43c2-ba44-3993ba9e8ac6" />
+
+
+- **Test Plan (Plan de Pruebas):** Es el nivel superior, la primera entidad que debes crear.
+- **Test Suites (Conjuntos de Pruebas):** Viven dentro del Test Plan (puedes tener uno o varios) y consisten en una combinación de diferentes escenarios de prueba.
+- **Test Cases (Casos de Prueba):** Viven dentro del Test Suite. Aquí es donde realmente se escriben los pasos detallados que se van a ejecutar.
+- **Conexión con Azure Boards:** Dependiendo de la metodología que uses en tu proyecto, estos Casos de Prueba se asocian a diferentes elementos de trabajo. En Scrum se enlazan a un Product Backlog Item, en Agile a una User Story, y en CMMI a un Requirement. También pueden estar enlazados a errores (Bugs).
+- **Shared Steps (Pasos Compartidos):** Ciertos pasos comunes se repiten en muchos tests. Para no tener que escribirlos una y otra vez, se crean "pasos compartidos" que se pueden reciclar y referenciar en múltiples casos de prueba.
